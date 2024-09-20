@@ -80,7 +80,9 @@ namespace StarterAssets
         private float _cinemachineTargetPitch;
 
         // player
+        private bool _lockRotation = false;
         private float _speed;
+        private float _sensitivity;
         private float _animationBlend;
         private float _targetRotation = 0.0f;
         private float _rotationVelocity;
@@ -198,8 +200,8 @@ namespace StarterAssets
                 //Don't multiply mouse input by Time.deltaTime;
                 float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
 
-                _cinemachineTargetYaw += _input.look.x * deltaTimeMultiplier;
-                _cinemachineTargetPitch += _input.look.y * deltaTimeMultiplier;
+                _cinemachineTargetYaw += _input.look.x * deltaTimeMultiplier * _sensitivity;
+                _cinemachineTargetPitch += _input.look.y * deltaTimeMultiplier * _sensitivity;
             }
 
             // clamp our rotations so our values are limited 360 degrees
@@ -259,9 +261,11 @@ namespace StarterAssets
                                   _mainCamera.transform.eulerAngles.y;
                 float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
                     RotationSmoothTime);
-
-                // rotate to face input direction relative to camera position
-                transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+                if (_lockRotation == false)
+                {
+                    // rotate to face input direction relative to camera position
+                    transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+                }
             }
 
 
@@ -387,6 +391,16 @@ namespace StarterAssets
             {
                 AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
             }
+        }
+
+        public void SetSenstivity(float valueToSet)
+        {
+            _sensitivity = valueToSet;
+        }
+
+        public void SetLockRotation(bool newValue)
+        {
+            _lockRotation = newValue;
         }
     }
 }
